@@ -7,3 +7,53 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+# StudioSpace — Client
+
+Peer-to-Peer Creative Workspace & Production Studio Sharing Platform. This repo is the **frontend only** (Next.js App Router); the backend lives elsewhere.
+
+## Stack
+
+- **Next.js 16** (App Router) + **TypeScript** (strict), Turbopack, React Compiler, `cacheComponents` enabled.
+- **Tailwind CSS v4** — CSS-first config. All theme tokens live in `src/app/globals.css` (`@theme inline`, `:root`, `.dark`); there is **no** `tailwind.config` file.
+- **shadcn/ui** — style `base-nova` (Base UI primitives, not Radix), config in `components.json`.
+- **Sonner** for toasts — `<Toaster />` is already mounted once in `src/app/layout.tsx`; just call `toast()` from `sonner`. Never mount a second `<Toaster />`.
+- **next-themes** — `ThemeProvider` is mounted in `src/app/layout.tsx` (`attribute="class"`); dark mode uses the `.dark` class. There is no theme-toggle UI yet.
+- **Brand tokens** — the StudioSpace identity (charcoal / warm cream / burnt orange) lives in `globals.css` (`--brand-*` in `:root` and `.dark`) and surfaces as utilities `brand-bg`, `brand-fg`, `brand-accent`, `brand-on-accent`, `brand-border`, plus `charcoal`/`cream`. Use these for app chrome; the shadcn tokens still drive everything else.
+- Icons: `lucide-react`. Class merging: `cn` from `@/lib/utils`.
+
+## Structure
+
+```
+src/
+├── app/                  # App Router: routes, layouts, loading/error files
+├── components/
+│   ├── ui/               # shadcn/ui primitives — generated, treat as read-only
+│   ├── layout/           # app chrome: navbar, footer, sidebar
+│   └── shared/           # feature-agnostic reusable components
+├── lib/                  # utilities, API client, constants (non-component code)
+├── hooks/                # reusable React hooks
+└── types/                # shared TypeScript types/interfaces/enums
+```
+
+Route-specific components colocate with the route: `src/app/dashboard/_components/`.
+
+## Conventions
+
+- Always import through the `@/*` alias → `./src/*` (e.g. `import { Button } from "@/components/ui/button"`).
+- Components are **Server Components by default**; add `"use client"` only when using state, effects, or browser-only APIs.
+- Do **not** hand-edit `src/components/ui/*` — add/replace with `npx shadcn add <component>` (aliases come from `components.json`).
+- Styling: Tailwind utility classes with theme tokens (`bg-background`, `text-muted-foreground`, …), `cn()` for conditional classes, dark mode via the `.dark` class.
+- Keep components presentational; data fetching and Server Actions belong in `src/lib/`.
+- **Navbar/auth foundation**: primary + account link definitions live in `src/lib/navigation.ts` (with `isActivePath`); the **mock auth state** lives in `src/hooks/use-auth.ts` (`MOCK_SIGNED_IN`, single `useAuth()` call in `<Navbar />`, passed down as props). Replace the hook's internals with Better Auth later — keep the `AuthState` shape.
+- Base UI gotcha: shadcn's `DropdownMenuLabel` is a `Menu.GroupLabel` and **must** be wrapped in `DropdownMenuGroup`, or it throws when the menu opens.
+- Desktop navbar collapses to the Sheet menu below `lg` (1024px).
+- **Homepage/data layer**: sections live in `src/components/home/` (server components; only the navbar is client). Backend access goes through `src/lib/api/client.ts` (`apiGet` + `ApiError`, base URL from `NEXT_PUBLIC_API_URL`) — never fetch inside components. `getFeaturedStudios()` in `src/lib/api/studios.ts` falls back to `src/lib/mock/studios.ts` while the API is unconfigured; mock data belongs only in `src/lib/mock/`. Category filters/links come from `src/lib/categories.ts` (`categoryHref(slug)` → `/studios?category=…`). Uncached data must sit inside a `<Suspense>` boundary (`cacheComponents` is on) — see `FeaturedStudiosSection`.
+- **Images**: photography is remote Unsplash via the `unsplash()` helper in `src/lib/images.ts` (`images.unsplash.com` is whitelisted in `next.config.ts`). Use `next/image` with `fill` + `sizes`.
+- **Typography gotcha**: `--font-sans` in `globals.css` must point at `var(--font-geist-sans)` (the `next/font` variable). It was originally a self-reference (`var(--font-sans)`), which silently fell back to Times New Roman everywhere.
+- Check `package.json` before installing anything — most UI needs are already covered (`@base-ui/react`, `cmdk`, `lucide-react`, `react-day-picker`, `date-fns`, `next-themes`, `sonner`, `tw-animate-css`).
+
+## Commands & verification
+
+- `npm run dev` — dev server, `npm run build` — production build, `npm run lint` — ESLint.
+- Before finishing a change: `npx tsc --noEmit`, then `npm run lint`, then `npm run build`.
