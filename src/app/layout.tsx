@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { Navbar } from "@/components/layout/navbar";
@@ -35,7 +36,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           enableSystem
           disableTransitionOnChange
         >
-          <Navbar />
+          {/* The Navbar reads `usePathname()`, which can't resolve while
+              prerendering the shell of routes with unknown dynamic params
+              (`/studios/[id]`). Suspense lets those routes stream the navbar
+              in; static routes still prerender it fully. */}
+          <Suspense
+            fallback={<div className="h-16 w-full border-b border-brand-border bg-brand-bg" />}
+          >
+            <Navbar />
+          </Suspense>
           <main className="flex-1">{children}</main>
           <Toaster />
         </ThemeProvider>
