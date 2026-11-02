@@ -4,9 +4,18 @@
  * The API base URL comes from `NEXT_PUBLIC_API_URL` (no trailing slash), e.g.
  * `http://localhost:5000/api`. When it is not configured, requests fail fast
  * with an `ApiError` so public pages can fall back to mock data.
+ *
+ * The server calls it directly. The browser goes through this site's own `/api`
+ * (rewritten in `next.config.ts`) so the session cookie stays first-party. That
+ * URL must be absolute because Better Auth rejects relative ones.
  */
 
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, "");
+const CONFIGURED_API_URL = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, "");
+
+export const API_BASE_URL =
+  CONFIGURED_API_URL && typeof window !== "undefined"
+    ? `${window.location.origin}/api`
+    : CONFIGURED_API_URL;
 
 export type FieldErrors = Record<string, string[] | undefined>;
 
