@@ -124,12 +124,11 @@ const REASONS: readonly Feature[] = [
  *
  * Fully static marketing page — no data fetching, so it prerenders like the
  * homepage. The two `StepFlow` sections double as the funnel for host
- * sign-ups; their CTA points at the homepage's `#host` section, the only live
- * host entry point until registration ships.
+ * sign-ups, so the closing CTA leads straight to listing a studio.
  */
 export default function HowItWorksPage() {
   return (
-    <main className="min-h-screen">
+    <div className="min-h-screen">
       <PageHero
         eyebrow="How it works"
         title={
@@ -175,8 +174,8 @@ export default function HowItWorksPage() {
         title="Ready to Create Something Extraordinary?"
         description="Browse verified studios near you — or open your own doors to creators and start earning by the hour."
         primary={{ label: "Explore Studios", href: "/studios" }}
-        secondary={{ label: "Become a Host", href: "/#host" }}
+        secondary={{ label: "Become a Host", href: "/dashboard/studios/new" }}
       />
-    </main>
+    </div>
   );
 }

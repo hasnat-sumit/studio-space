@@ -30,15 +30,19 @@ export function StudioHeader({ studio }: StudioHeaderProps) {
             <MapPinIcon className="size-4 shrink-0" aria-hidden="true" />
             {studio.location}
           </span>
-          <span className="inline-flex items-center gap-2">
-            <StarRating rating={studio.rating} />
-            <span>
-              <span className="font-medium text-foreground">
-                {studio.rating.toFixed(1)}
-              </span>{" "}
-              ({studio.reviewCount} reviews)
+          {studio.reviewCount > 0 ? (
+            <span className="inline-flex items-center gap-2">
+              <StarRating rating={studio.rating} />
+              <span>
+                <span className="font-medium text-foreground">
+                  {studio.rating.toFixed(1)}
+                </span>{" "}
+                ({studio.reviewCount} reviews)
+              </span>
             </span>
-          </span>
+          ) : (
+            <span>New listing, no reviews yet</span>
+          )}
           <span className="inline-flex items-center gap-1.5">
             <UsersIcon className="size-4 shrink-0" aria-hidden="true" />
             Seats up to {studio.capacity}

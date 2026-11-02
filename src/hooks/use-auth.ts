@@ -1,45 +1,50 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { toast } from "sonner";
+import { authClient } from "@/lib/auth-client";
 import type { SessionUser } from "@/types/auth";
-
-/**
- * Placeholder mock authentication state — there is no real session yet.
- *
- * When Better Auth is implemented later, replace the internals of this hook
- * (e.g. with `authClient.useSession()`) but keep the returned `AuthState`
- * shape: the navbar and the rest of the UI only depend on that contract.
- */
-const MOCK_USER: SessionUser = {
-  id: "user_demo_01",
-  name: "Aria Vale",
-  email: "aria.vale@studiospace.io",
-  image: null,
-};
-
-/** Set to `false` to preview the logged-out navbar without touching any UI code. */
-const MOCK_SIGNED_IN = true;
 
 export interface AuthState {
   user: SessionUser | null;
   isAuthenticated: boolean;
+  /** True until the first session check finishes; don't redirect before then. */
+  isPending: boolean;
   logout: () => void;
+  /**
+   * Re-reads the session and settles once the store is updated. Await it after
+   * signing in, before navigating, or the dashboard guard sees no user yet.
+   */
+  refresh: () => Promise<void>;
 }
 
 export function useAuth(): AuthState {
-  const [user, setUser] = useState<SessionUser | null>(
-    MOCK_SIGNED_IN ? MOCK_USER : null
-  );
+  const { data, isPending, refetch } = authClient.useSession();
 
   const logout = useCallback(() => {
-    // Replace with Better Auth's signOut() when authentication is implemented.
-    setUser(null);
-    toast.success("Signed out", {
-      description:
-        "This session is mocked while authentication is under construction.",
+    void authClient.signOut().then(({ error }) => {
+      if (error) {
+        toast.error("Couldn't sign you out", {
+          description: error.message ?? "Please try again.",
+        });
+        return;
+      }
+      toast.success("Signed out");
     });
   }, []);
 
-  return { user, isAuthenticated: user !== null, logout };
+  const refresh = useCallback(async () => {
+    await refetch();
+  }, [refetch]);
+
+  const user: SessionUser | null = data?.user
+    ? {
+        id: data.user.id,
+        name: data.user.name,
+        email: data.user.email,
+        image: data.user.image ?? null,
+      }
+    : null;
+
+  return { user, isAuthenticated: user !== null, isPending, logout, refresh };
 }

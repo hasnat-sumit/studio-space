@@ -22,7 +22,7 @@ export default function StudioDetailError({
   }, [error]);
 
   return (
-    <main className="mx-auto w-full max-w-2xl px-4 py-24 text-center sm:px-6 lg:px-8">
+    <div className="mx-auto w-full max-w-2xl px-4 py-24 text-center sm:px-6 lg:px-8">
       <span className="mx-auto grid size-12 place-items-center rounded-full bg-destructive/10 text-destructive">
         <TriangleAlertIcon className="size-5" aria-hidden="true" />
       </span>
@@ -53,6 +53,6 @@ export default function StudioDetailError({
           Explore studios
         </Link>
       </div>
-    </main>
+    </div>
   );
 }

@@ -4,15 +4,14 @@ import type { StudioReview } from "@/types/review";
 
 export interface StudioReviewsResult {
   reviews: StudioReview[];
-  /** "mock" while the backend is unavailable — lets the UI stay honest. */
+  /** "mock" when no backend is configured — lets the UI stay honest. */
   source: "api" | "mock";
 }
 
 /**
  * Fetches written reviews for one studio.
  *
- * Expected endpoint: `GET /studios/:slug/reviews` → `StudioReview[]`,
- * newest first.
+ * Endpoint: `GET /studios/:slug/reviews` → `StudioReview[]`, newest first.
  */
 export async function fetchReviews(studioSlug: string): Promise<StudioReview[]> {
   const reviews = await apiGet<StudioReview[]>(
@@ -31,9 +30,8 @@ export async function fetchReviews(studioSlug: string): Promise<StudioReview[]> 
 /**
  * App-facing entry point for the studio details page's reviews section.
  *
- * Never throws: falls back to the mock reviews while the backend is
- * unconfigured or unreachable. An empty list is a real answer (the section
- * shows its own empty state).
+ * Serves mock reviews only when no backend is configured. An empty list is a
+ * real answer (the section shows its own empty state).
  */
 export async function getReviews(
   studioSlug: string
@@ -42,10 +40,5 @@ export async function getReviews(
     return { reviews: mockReviewsFor(studioSlug), source: "mock" };
   }
 
-  try {
-    return { reviews: await fetchReviews(studioSlug), source: "api" };
-  } catch (error) {
-    console.warn("[reviews] API unavailable, serving mock data.", error);
-    return { reviews: mockReviewsFor(studioSlug), source: "mock" };
-  }
+  return { reviews: await fetchReviews(studioSlug), source: "api" };
 }

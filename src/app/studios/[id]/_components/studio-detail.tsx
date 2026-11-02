@@ -34,7 +34,7 @@ export async function StudioDetail({ params }: StudioDetailProps) {
 
   if (!studio) notFound();
 
-  const { reviews } = await getReviews(studio.slug);
+  const { reviews, source } = await getReviews(studio.slug);
 
   // Defensive: API responses predating the gallery field fall back to the
   // studio's single image.
@@ -64,12 +64,9 @@ export async function StudioDetail({ params }: StudioDetailProps) {
           <StudioOverview studio={studio} />
           <StudioHost host={studio.host} />
           <StudioReviews
-            studio={{
-              title: studio.title,
-              rating: studio.rating,
-              reviewCount: studio.reviewCount,
-            }}
+            studio={studio}
             reviews={reviews}
+            source={source}
           />
         </div>
       </div>

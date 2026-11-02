@@ -5,7 +5,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LogInIcon, LogOutIcon, MenuIcon, UserPlusIcon } from "lucide-react";
 import { cn, getInitials } from "@/lib/utils";
-import { ACCOUNT_LINKS, NAV_LINKS, isActivePath } from "@/lib/navigation";
+import {
+  ACCOUNT_LINKS,
+  NAV_LINKS,
+  activeAccountHref,
+  isActivePath,
+} from "@/lib/navigation";
 import type { NavLink } from "@/lib/navigation";
 import type { SessionUser } from "@/types/auth";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -105,7 +110,7 @@ export function NavbarMobileMenu({ user, onLogout }: NavbarMobileMenuProps) {
                 <MobileNavLink
                   key={link.href}
                   link={link}
-                  active={isActivePath(link.href, pathname)}
+                  active={link.href === activeAccountHref(pathname)}
                   onClick={() => setOpen(false)}
                 />
               ))}

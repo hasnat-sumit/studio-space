@@ -24,7 +24,7 @@ interface StudiosPageProps {
  */
 export default function StudiosPage({ searchParams }: StudiosPageProps) {
   return (
-    <main className="min-h-screen">
+    <div className="min-h-screen">
       <StudiosMasthead />
 
       <section
@@ -35,6 +35,6 @@ export default function StudiosPage({ searchParams }: StudiosPageProps) {
           <StudiosResults searchParams={searchParams} />
         </Suspense>
       </section>
-    </main>
+    </div>
   );
 }

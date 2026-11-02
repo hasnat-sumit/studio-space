@@ -2,21 +2,24 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Loader2Icon, UserPlusIcon } from "lucide-react";
 import { toast } from "sonner";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { useAuth } from "@/hooks/use-auth";
+import { authClient, safeNextPath } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 
 /**
- * Registration form — UI only while Better Auth is deferred.
- * Client-side validation runs, then the submit explains that authentication
- * isn't wired yet instead of pretending an account was created. Swap the
- * `onSubmit` body for Better Auth's `authClient.signUp.email()` later.
+ * Registration form. Creates the account through Better Auth, which also starts
+ * the session, then returns to `?next=` or the dashboard.
  */
 export function RegisterForm() {
+  const router = useRouter();
+  const { refresh } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -29,7 +32,7 @@ export function RegisterForm() {
   }>({});
   const [submitting, setSubmitting] = useState(false);
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const nextErrors: typeof errors = {};
@@ -49,15 +52,24 @@ export function RegisterForm() {
     if (Object.keys(nextErrors).length > 0) return;
 
     setSubmitting(true);
-    // Simulate the round-trip so the pending state is visible, then be
-    // honest: no account exists until Better Auth ships.
-    window.setTimeout(() => {
+    const { error } = await authClient.signUp.email({
+      name: name.trim(),
+      email: email.trim(),
+      password,
+    });
+
+    if (error) {
       setSubmitting(false);
-      toast.info("Registration isn't live yet", {
-        description:
-          "Authentication is coming soon — this preview validates your input only.",
+      toast.error("Couldn't create your account", {
+        description: error.message ?? "Please try again in a moment.",
       });
-    }, 600);
+      return;
+    }
+
+    await refresh();
+    toast.success("Welcome to StudioSpace");
+    const next = new URLSearchParams(window.location.search).get("next");
+    router.replace(safeNextPath(next));
   }
 
   return (

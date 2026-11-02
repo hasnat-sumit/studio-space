@@ -10,7 +10,7 @@ import {
   sortStudios,
   studioQueryToSearchParams,
 } from "@/lib/studio-query";
-import { StudioCard } from "./studio-card";
+import { StudioCard } from "@/components/shared/studio-card";
 import { StudioFilters, StudioSortSelect } from "./studio-filters";
 import { StudiosEmpty, StudiosLoadError } from "./studios-states";
 import type { Studio, StudioQuery } from "@/types/studio";
@@ -130,7 +130,7 @@ export function StudiosExplorer({
           <ul className="mt-10 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
             {visible.map((studio) => (
               <li key={studio.id} className="flex">
-                <StudioCard studio={studio} />
+                <StudioCard studio={studio} variant="detailed" />
               </li>
             ))}
           </ul>

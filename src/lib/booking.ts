@@ -1,8 +1,8 @@
 /**
- * Pure booking-form logic for the studio details page.
+ * Pure booking logic shared by the booking panel and the dashboard.
  *
- * The booking panel is a *preview*: these helpers compute the estimated price
- * from the chosen hours, but nothing is submitted anywhere yet.
+ * These helpers compute the *displayed* estimate; the API recalculates the real
+ * price from the listing when a booking is created.
  */
 
 export interface BookingSlot {
@@ -43,10 +43,16 @@ export const BOOKING_SLOTS: readonly BookingSlot[] = buildSlots();
 
 export const DEFAULT_START_SLOT = "09:00";
 export const DEFAULT_END_SLOT = "11:00";
+export const MIN_BOOKING_HOURS = 1;
 
 /** Minutes since midnight for a slot value (0 when unknown). */
 export function slotMinutes(value: string | undefined): number {
   return BOOKING_SLOTS.find((slot) => slot.value === value)?.minutes ?? 0;
+}
+
+/** 12-hour label for a slot value: "14:30" → "2:30 PM". */
+export function slotLabel(value: string): string {
+  return BOOKING_SLOTS.find((slot) => slot.value === value)?.label ?? value;
 }
 
 /** Booked hours from a start/end pair; `null` when the range is invalid. */

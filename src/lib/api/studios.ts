@@ -4,16 +4,16 @@ import type { Studio } from "@/types/studio";
 
 export interface FeaturedStudiosResult {
   studios: Studio[];
-  /** "mock" while the backend is unavailable — lets the UI stay honest. */
+  /** "mock" when no backend is configured — lets the UI stay honest. */
   source: "api" | "mock";
 }
 
 /**
  * Fetches the highest-rated studios from the backend.
  *
- * Expected endpoint: `GET /studios/featured?limit=6` → `Studio[]`, already
- * sorted by rating. Sorting defensively on the client keeps the contract safe
- * even if the backend changes order.
+ * Endpoint: `GET /studios/featured?limit=6` → `Studio[]`, already sorted by
+ * rating. Sorting defensively on the client keeps the contract safe even if the
+ * backend changes order.
  */
 export async function fetchFeaturedStudios(limit = 6): Promise<Studio[]> {
   const studios = await apiGet<Studio[]>(`/studios/featured?limit=${limit}`);
@@ -30,10 +30,10 @@ export async function fetchFeaturedStudios(limit = 6): Promise<Studio[]> {
 /**
  * App-facing entry point for the homepage.
  *
- * Never throws for ordinary API problems: when the backend is unconfigured or
- * unreachable, it silently serves the mock data from `src/lib/mock/studios.ts`
- * so the homepage always renders. An empty `api` response stays empty — that
- * is a real answer, and the UI shows its empty state.
+ * Serves `src/lib/mock/studios.ts` only when no backend is configured. Once one
+ * is, failures throw (the section renders its error state): falling back would
+ * show listings that can't actually be booked. An empty `api` response stays
+ * empty — that is a real answer, and the UI shows its empty state.
  */
 export async function getFeaturedStudios(
   limit = 6
@@ -42,30 +42,22 @@ export async function getFeaturedStudios(
     return { studios: mockFeaturedStudios(limit), source: "mock" };
   }
 
-  try {
-    const studios = await fetchFeaturedStudios(limit);
-    return { studios, source: "api" };
-  } catch (error) {
-    console.warn("[studios] API unavailable, serving mock data.", error);
-    return { studios: mockFeaturedStudios(limit), source: "mock" };
-  }
+  return { studios: await fetchFeaturedStudios(limit), source: "api" };
 }
 
 export interface StudiosResult {
   studios: Studio[];
   /** Total number of listings in the catalogue. */
   total: number;
-  /** "mock" while the backend is unavailable — lets the UI stay honest. */
+  /** "mock" when no backend is configured — lets the UI stay honest. */
   source: "api" | "mock";
 }
 
 /**
- * Fetches the full catalogue from the backend, unfiltered.
+ * Fetches the catalogue from the backend, unfiltered.
  *
- * Expected endpoint: `GET /studios` → `Studio[]`. Until the API supports
- * query strings, the Explore page filters, sorts, and pages client-side with
- * the pure helpers in `src/lib/studio-query.ts` — the same params (`q`,
- * `category`, `price`, `capacity`, `sort`) are ready to hand over later.
+ * Endpoint: `GET /studios` → `Studio[]`. The Explore page filters, sorts, and
+ * pages client-side with the pure helpers in `src/lib/studio-query.ts`.
  */
 export async function fetchStudios(): Promise<Studio[]> {
   const studios = await apiGet<Studio[]>("/studios");
@@ -80,9 +72,8 @@ export async function fetchStudios(): Promise<Studio[]> {
 /**
  * App-facing entry point for the Explore Studios page (`/studios`).
  *
- * Mirrors `getFeaturedStudios`: falls back to the mock catalogue when the
- * backend is unconfigured or unreachable, and only throws for callers that
- * opt into rendering an error state (the route's `error.tsx`).
+ * Mirrors `getFeaturedStudios`: mock catalogue when no backend is configured,
+ * otherwise failures reach the route's `error.tsx`.
  */
 export async function getStudios(): Promise<StudiosResult> {
   if (!isApiConfigured()) {
@@ -93,23 +84,14 @@ export async function getStudios(): Promise<StudiosResult> {
     };
   }
 
-  try {
-    const studios = await fetchStudios();
-    return { studios, total: studios.length, source: "api" };
-  } catch (error) {
-    console.warn("[studios] API unavailable, serving mock data.", error);
-    return {
-      studios: [...MOCK_STUDIOS],
-      total: MOCK_STUDIOS.length,
-      source: "mock",
-    };
-  }
+  const studios = await fetchStudios();
+  return { studios, total: studios.length, source: "api" };
 }
 
 /**
  * Fetches one studio by its id or slug.
  *
- * Expected endpoint: `GET /studios/:idOrSlug` → `Studio`.
+ * Endpoint: `GET /studios/:idOrSlug` → `Studio`.
  */
 export async function fetchStudio(idOrSlug: string): Promise<Studio> {
   const studio = await apiGet<Studio>(
@@ -128,15 +110,15 @@ export async function fetchStudio(idOrSlug: string): Promise<Studio> {
  *
  * Returns `null` when the studio doesn't exist (both for a missing mock
  * record and for a backend 404) so the page can render its Not Found state.
+ * Other API failures reach the route's `error.tsx`.
  */
 export async function getStudio(idOrSlug: string): Promise<Studio | null> {
-  const findMock = () =>
-    MOCK_STUDIOS.find(
-      (studio) => studio.slug === idOrSlug || studio.id === idOrSlug
-    ) ?? null;
-
   if (!isApiConfigured()) {
-    return findMock();
+    return (
+      MOCK_STUDIOS.find(
+        (studio) => studio.slug === idOrSlug || studio.id === idOrSlug
+      ) ?? null
+    );
   }
 
   try {
@@ -145,7 +127,6 @@ export async function getStudio(idOrSlug: string): Promise<Studio | null> {
     if (error instanceof ApiError && error.status === 404) {
       return null;
     }
-    console.warn("[studios] API unavailable, serving mock data.", error);
-    return findMock();
+    throw error;
   }
 }

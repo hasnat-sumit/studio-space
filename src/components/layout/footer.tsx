@@ -40,8 +40,8 @@ const CURRENT_YEAR = new Date().getFullYear();
 /**
  * Site footer rendered on every route from the root layout.
  * Charcoal band matching `CtaBand`/`HostCta` so pages close on the
- * brand's darkest surface. The `/dashboard` links 404 until the dashboard
- * ships; `NAV_LINKS` supplies the primary navigation so it can't drift.
+ * brand's darkest surface. `NAV_LINKS` supplies the primary navigation so it
+ * can't drift.
  */
 export function Footer() {
   return (

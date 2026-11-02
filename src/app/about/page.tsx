@@ -52,12 +52,11 @@ const VALUES: readonly Feature[] = [
  *
  * Static editorial page: hero, alternating mission/vision rows, the brand
  * values grid, and a closing CTA. Like `/how-it-works`, it prerenders fully
- * and links only to live routes — host conversion points at the homepage
- * `#host` section until registration ships.
+ * and links only to live routes.
  */
 export default function AboutPage() {
   return (
-    <main className="min-h-screen">
+    <div className="min-h-screen">
       <PageHero
         eyebrow="About StudioSpace"
         title={
@@ -88,8 +87,8 @@ export default function AboutPage() {
         title="Come Build the Scene With Us"
         description="Whether you shoot, record, paint, or podcast — there's a room here for you. And if you own one, there's a creator looking for it right now."
         primary={{ label: "Discover Spaces", href: "/studios" }}
-        secondary={{ label: "List Your Studio", href: "/#host" }}
+        secondary={{ label: "List Your Studio", href: "/dashboard/studios/new" }}
       />
-    </main>
+    </div>
   );
 }

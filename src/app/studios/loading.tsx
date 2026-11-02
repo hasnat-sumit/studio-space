@@ -4,7 +4,7 @@ import { StudiosMasthead } from "./_components/studios-masthead";
 /** Route-level loading state shown while the catalogue streams in. */
 export default function StudiosLoading() {
   return (
-    <main className="min-h-screen">
+    <div className="min-h-screen">
       <StudiosMasthead />
 
       <section
@@ -13,6 +13,6 @@ export default function StudiosLoading() {
       >
         <StudiosExplorerSkeleton />
       </section>
-    </main>
+    </div>
   );
 }

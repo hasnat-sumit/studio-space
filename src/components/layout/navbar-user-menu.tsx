@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LogOutIcon } from "lucide-react";
 import { cn, getInitials } from "@/lib/utils";
-import { ACCOUNT_LINKS, isActivePath } from "@/lib/navigation";
+import { ACCOUNT_LINKS, activeAccountHref } from "@/lib/navigation";
 import type { SessionUser } from "@/types/auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -23,7 +23,7 @@ interface NavbarUserMenuProps {
 }
 
 export function NavbarUserMenu({ user, onLogout }: NavbarUserMenuProps) {
-  const pathname = usePathname();
+  const activeHref = activeAccountHref(usePathname());
 
   return (
     <DropdownMenu>
@@ -55,7 +55,7 @@ export function NavbarUserMenu({ user, onLogout }: NavbarUserMenuProps) {
         <DropdownMenuSeparator />
 
         {ACCOUNT_LINKS.map((link) => {
-          const active = isActivePath(link.href, pathname);
+          const active = link.href === activeHref;
           return (
             <DropdownMenuItem
               key={link.href}

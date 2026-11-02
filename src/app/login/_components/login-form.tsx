@@ -2,21 +2,24 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Loader2Icon, LogInIcon } from "lucide-react";
 import { toast } from "sonner";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { useAuth } from "@/hooks/use-auth";
+import { authClient, safeNextPath } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 
 /**
- * Login form — UI only while Better Auth is deferred.
- * Client-side validation runs, then the submit explains that authentication
- * isn't wired yet instead of pretending a session started. Swap the
- * `onSubmit` body for Better Auth's `authClient.signIn.email()` later.
+ * Login form. Signs in through Better Auth, then returns to `?next=` (read at
+ * submit time, so the page itself stays static) or the dashboard.
  */
 export function LoginForm() {
+  const router = useRouter();
+  const { refresh } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<{ email?: string; password?: string }>(
@@ -24,7 +27,7 @@ export function LoginForm() {
   );
   const [submitting, setSubmitting] = useState(false);
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const nextErrors: typeof errors = {};
@@ -39,15 +42,26 @@ export function LoginForm() {
     if (Object.keys(nextErrors).length > 0) return;
 
     setSubmitting(true);
-    // Simulate the round-trip so the pending state is visible, then be
-    // honest: no session exists until Better Auth ships.
-    window.setTimeout(() => {
+    const { error } = await authClient.signIn.email({
+      email: email.trim(),
+      password,
+    });
+
+    if (error) {
       setSubmitting(false);
-      toast.info("Sign in isn't live yet", {
+      toast.error("Couldn't sign you in", {
         description:
-          "Authentication is coming soon — this preview validates your input only.",
+          error.status === 401
+            ? "That email and password don't match."
+            : (error.message ?? "Please try again in a moment."),
       });
-    }, 600);
+      return;
+    }
+
+    await refresh();
+    toast.success("Welcome back");
+    const next = new URLSearchParams(window.location.search).get("next");
+    router.replace(safeNextPath(next));
   }
 
   return (
@@ -79,7 +93,7 @@ export function LoginForm() {
             type="button"
             onClick={() =>
               toast.info("Password reset isn't live yet", {
-                description: "This arrives with authentication.",
+                description: "Resetting by email needs an email service, which isn't set up.",
               })
             }
             className="rounded text-sm text-brand-accent outline-none transition-colors hover:text-brand-accent/80 focus-visible:ring-3 focus-visible:ring-brand-accent/40"

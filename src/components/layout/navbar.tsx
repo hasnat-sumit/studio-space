@@ -10,10 +10,11 @@ import { buttonVariants } from "@/components/ui/button";
 import { NavbarBrand } from "@/components/layout/navbar-brand";
 import { NavbarUserMenu } from "@/components/layout/navbar-user-menu";
 import { NavbarMobileMenu } from "@/components/layout/navbar-mobile-menu";
+import { ThemeToggle } from "@/components/layout/theme-toggle";
 
 export function Navbar() {
   const pathname = usePathname();
-  const { user, logout } = useAuth();
+  const { user, isPending, logout } = useAuth();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-brand-border bg-brand-bg backdrop-blur-md">
@@ -45,8 +46,12 @@ export function Navbar() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           <div className="hidden items-center gap-2 lg:flex">
-            {user ? (
+            {isPending ? (
+              // Hold the space so the login buttons don't flash for signed-in users.
+              <div className="size-9" aria-hidden="true" />
+            ) : user ? (
               <NavbarUserMenu user={user} onLogout={logout} />
             ) : (
               <>

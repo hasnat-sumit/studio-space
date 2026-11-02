@@ -7,6 +7,7 @@ import {
   HouseIcon,
   InfoIcon,
   LayoutDashboardIcon,
+  UserRoundIcon,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -30,7 +31,20 @@ export const ACCOUNT_LINKS: readonly NavLink[] = [
   { label: "Add New Studio", href: "/dashboard/studios/new", icon: CirclePlusIcon },
   { label: "My Studio Listings", href: "/dashboard/studios", icon: BuildingIcon },
   { label: "My Bookings", href: "/dashboard/bookings", icon: CalendarCheckIcon },
+  { label: "My Profile", href: "/dashboard/profile", icon: UserRoundIcon },
 ];
+
+/**
+ * The account link for `pathname`. The most specific match wins, so
+ * `/dashboard/studios/new` highlights only "Add New Studio", not its parents.
+ */
+export function activeAccountHref(pathname: string): string | null {
+  const matches = ACCOUNT_LINKS.filter((link) => isActivePath(link.href, pathname));
+  return matches.reduce<string | null>(
+    (best, link) => (!best || link.href.length > best.length ? link.href : best),
+    null
+  );
+}
 
 /** True when `pathname` is `href` or a child route of it (Home only matches exactly). */
 export function isActivePath(href: string, pathname: string): boolean {

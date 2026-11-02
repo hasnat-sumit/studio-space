@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
  */
 export default function StudioNotFound() {
   return (
-    <main className="mx-auto w-full max-w-2xl px-4 py-24 text-center sm:px-6 lg:px-8">
+    <div className="mx-auto w-full max-w-2xl px-4 py-24 text-center sm:px-6 lg:px-8">
       <span className="mx-auto grid size-12 place-items-center rounded-full bg-brand-accent/10 text-brand-accent">
         <SearchXIcon className="size-5" aria-hidden="true" />
       </span>
@@ -44,6 +44,6 @@ export default function StudioNotFound() {
           Back to home
         </Link>
       </div>
-    </main>
+    </div>
   );
 }

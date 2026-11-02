@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowRightIcon } from "lucide-react";
 import { getFeaturedStudios } from "@/lib/api/studios";
 import { SectionHeading } from "@/components/shared/section-heading";
-import { StudioCard } from "@/components/home/studio-card";
+import { StudioCard } from "@/components/shared/studio-card";
 import { FeaturedStudiosSkeleton } from "@/components/home/featured-studios-skeleton";
 import {
   FeaturedStudiosEmpty,

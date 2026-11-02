@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { CalendarIcon, ClockIcon, InfoIcon } from "lucide-react";
 import { toast } from "sonner";
@@ -27,14 +28,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { useAuth } from "@/hooks/use-auth";
+import { createBooking, getStudioBookedSlots } from "@/lib/api/account";
+import { ApiError, isApiConfigured } from "@/lib/api/client";
 import {
   BOOKING_SLOTS,
   DEFAULT_END_SLOT,
   DEFAULT_START_SLOT,
+  MIN_BOOKING_HOURS,
   bookingHours,
   estimateBookingTotal,
   formatHours,
   formatMoney,
+  slotLabel,
 } from "@/lib/booking";
 import { cn } from "@/lib/utils";
 import type { Studio } from "@/types/studio";
@@ -53,16 +60,24 @@ interface BookingPanelProps {
 /**
  * Sticky booking card (desktop) that flows inline on mobile.
  *
- * The "Book This Workspace" CTA opens a *preview* dialog: date and time
- * inputs are fully controlled and the estimated total is computed live, but
- * nothing is submitted — real bookings connect in a later task.
+ * The "Book This Workspace" CTA opens the request dialog. With a backend it
+ * creates a real booking request for the host to confirm; the API recalculates
+ * the price and rejects any overlap. Without one it stays a labelled preview.
  */
 export function BookingPanel({ studio }: BookingPanelProps) {
+  const router = useRouter();
+  const { user } = useAuth();
+  const live = isApiConfigured();
+  const isOwnStudio = user?.id === studio.host.id;
+
   const [open, setOpen] = React.useState(false);
   const [dateOpen, setDateOpen] = React.useState(false);
   const [date, setDate] = React.useState<Date | undefined>(undefined);
   const [start, setStart] = React.useState(DEFAULT_START_SLOT);
   const [end, setEnd] = React.useState(DEFAULT_END_SLOT);
+  const [notes, setNotes] = React.useState("");
+  const [bookedSlots, setBookedSlots] = React.useState<string[]>([]);
+  const [submitting, setSubmitting] = React.useState(false);
 
   const today = React.useMemo(() => {
     const now = new Date();
@@ -72,13 +87,79 @@ export function BookingPanel({ studio }: BookingPanelProps) {
   const hours = bookingHours(start, end);
   const total = estimateBookingTotal(studio.hourlyRate, start, end);
   const invalidRange = hours === null;
-  const canConfirm = Boolean(date) && !invalidRange;
+  const tooShort = hours !== null && hours < MIN_BOOKING_HOURS;
+  // A booked slot starting at `slot` overlaps when it falls inside [start, end).
+  const overlapsBooking = bookedSlots.some((slot) => slot >= start && slot < end);
+  const canConfirm =
+    Boolean(date) && !invalidRange && !tooShort && !overlapsBooking && !submitting;
 
-  function handleConfirm() {
-    toast.info(
-      `Bookings open soon — ${studio.title} isn't reservable yet. Nothing was submitted.`
-    );
-    setOpen(false);
+  function handleSelectDate(value: Date | undefined) {
+    setDate(value);
+    setDateOpen(false);
+    setBookedSlots([]);
+    if (!value || !live) return;
+
+    // Best effort: the API still rejects overlaps if this check is skipped or stale.
+    const selected = format(value, "yyyy-MM-dd");
+    getStudioBookedSlots(studio.id, selected)
+      .then((result) => setBookedSlots(result.bookedSlots))
+      .catch(() => setBookedSlots([]));
+  }
+
+  function handleOpen() {
+    if (live && !user) {
+      toast.info("Sign in to book this space");
+      router.push(`/login?next=${encodeURIComponent(`/studios/${studio.slug}`)}`);
+      return;
+    }
+    setOpen(true);
+  }
+
+  async function handleConfirm() {
+    if (!live) {
+      toast.info(
+        `This is a preview — ${studio.title} isn't reservable without the backend. Nothing was submitted.`
+      );
+      setOpen(false);
+      return;
+    }
+    if (!date) return;
+
+    setSubmitting(true);
+    try {
+      await createBooking({
+        studioId: studio.id,
+        date: format(date, "yyyy-MM-dd"),
+        start,
+        end,
+        notes: notes.trim(),
+      });
+      toast.success("Request sent", {
+        description: `${studio.host.name} will confirm or decline it. Track it in My Bookings.`,
+        action: {
+          label: "View",
+          onClick: () => router.push("/dashboard/bookings"),
+        },
+      });
+      setOpen(false);
+      setDate(undefined);
+      setNotes("");
+      setBookedSlots([]);
+    } catch (cause) {
+      toast.error("Couldn't send your request", {
+        description: cause instanceof ApiError ? cause.message : "Please try again.",
+      });
+      // Someone may have taken the slot since the dialog opened.
+      if (cause instanceof ApiError && cause.status === 409) {
+        const result = await getStudioBookedSlots(
+          studio.id,
+          format(date, "yyyy-MM-dd")
+        ).catch(() => null);
+        if (result) setBookedSlots(result.bookedSlots);
+      }
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -112,16 +193,17 @@ export function BookingPanel({ studio }: BookingPanelProps) {
 
         <Button
           type="button"
-          onClick={() => setOpen(true)}
+          disabled={isOwnStudio}
+          onClick={handleOpen}
           className="mt-6 h-11 w-full bg-brand-accent px-6 text-[15px] text-brand-on-accent shadow-sm hover:bg-brand-accent/90 hover:text-brand-on-accent focus-visible:border-brand-accent/40 focus-visible:ring-brand-accent/30"
         >
-          Book This Workspace
+          {isOwnStudio ? "This is your listing" : "Book This Workspace"}
         </Button>
 
         <p className="mt-3 flex items-start gap-1.5 text-xs leading-relaxed text-muted-foreground">
           <InfoIcon className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
-          You won&apos;t be charged yet — payment and confirmation arrive with
-          the booking release.
+          You won&apos;t be charged online. The host confirms your request, and
+          you arrange payment with them directly.
         </p>
       </div>
 
@@ -130,8 +212,9 @@ export function BookingPanel({ studio }: BookingPanelProps) {
           <DialogHeader>
             <DialogTitle>Request {studio.title}</DialogTitle>
             <DialogDescription>
-              A preview of the booking form — nothing entered here creates a
-              reservation.
+              {live
+                ? "Choose a time and send your request. The host will confirm or decline it."
+                : "A preview of the booking form — nothing entered here creates a reservation."}
             </DialogDescription>
           </DialogHeader>
 
@@ -159,10 +242,7 @@ export function BookingPanel({ studio }: BookingPanelProps) {
                   <Calendar
                     mode="single"
                     selected={date}
-                    onSelect={(value) => {
-                      setDate(value);
-                      setDateOpen(false);
-                    }}
+                    onSelect={handleSelectDate}
                     disabled={(day) => day < today}
                   />
                 </PopoverContent>
@@ -243,14 +323,37 @@ export function BookingPanel({ studio }: BookingPanelProps) {
                 </span>
               </div>
               <p className="mt-2 text-xs text-muted-foreground">
-                Plus a {formatMoney(studio.deposit)} refundable deposit, due
-                when bookings open.
+                Plus a {formatMoney(studio.deposit)} refundable deposit, arranged
+                with the host.
               </p>
             </div>
+
+            {live ? (
+              <div className="flex flex-col gap-1.5 sm:col-span-2">
+                <Label htmlFor="booking-notes">Message to the host (optional)</Label>
+                <Textarea
+                  id="booking-notes"
+                  rows={2}
+                  maxLength={500}
+                  value={notes}
+                  onChange={(event) => setNotes(event.target.value)}
+                  placeholder="What are you working on?"
+                />
+              </div>
+            ) : null}
 
             {invalidRange ? (
               <p role="alert" className="text-xs text-destructive sm:col-span-2">
                 The end time must be after the start time.
+              </p>
+            ) : tooShort ? (
+              <p role="alert" className="text-xs text-destructive sm:col-span-2">
+                The minimum booking is {MIN_BOOKING_HOURS} hour.
+              </p>
+            ) : overlapsBooking ? (
+              <p role="alert" className="text-xs text-destructive sm:col-span-2">
+                Part of that time is already booked. Booked from:{" "}
+                {bookedSlots.map(slotLabel).join(", ")}.
               </p>
             ) : null}
           </div>
@@ -267,17 +370,18 @@ export function BookingPanel({ studio }: BookingPanelProps) {
             <Button
               type="button"
               disabled={!canConfirm}
-              onClick={handleConfirm}
+              onClick={() => void handleConfirm()}
               className="bg-brand-accent text-brand-on-accent shadow-sm hover:bg-brand-accent/90 hover:text-brand-on-accent focus-visible:border-brand-accent/40 focus-visible:ring-brand-accent/30"
             >
-              Confirm request
+              {submitting ? "Sending…" : "Confirm request"}
             </Button>
           </DialogFooter>
 
-          <p className="text-center text-xs text-muted-foreground sm:-mt-1">
-            Booking goes live soon — this preview won&apos;t create a
-            reservation.
-          </p>
+          {live ? null : (
+            <p className="text-center text-xs text-muted-foreground sm:-mt-1">
+              This preview won&apos;t create a reservation.
+            </p>
+          )}
         </DialogContent>
       </Dialog>
     </>
