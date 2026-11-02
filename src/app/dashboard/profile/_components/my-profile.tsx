@@ -194,7 +194,10 @@ function PasswordForm() {
 
     if (error) {
       toast.error("Couldn't change your password", {
-        description: error.message ?? "Please try again.",
+        description:
+          error.code === "CREDENTIAL_ACCOUNT_NOT_FOUND"
+            ? "You sign in with Google, so this account has no password to change."
+            : (error.message ?? "Please try again."),
       });
       return;
     }

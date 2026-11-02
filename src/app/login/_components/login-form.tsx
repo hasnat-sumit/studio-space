@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Loader2Icon, LogInIcon } from "lucide-react";
 import { toast } from "sonner";
+import { GoogleButton } from "@/components/auth/google-button";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -131,6 +132,8 @@ export function LoginForm() {
         )}
         {submitting ? "Signing in…" : "Sign in"}
       </Button>
+
+      <GoogleButton label="Sign in with Google" />
 
       <div className="flex items-center gap-3">
         <Separator className="flex-1" />
