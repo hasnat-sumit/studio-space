@@ -94,23 +94,4 @@ src/
 
 `AGENTS.md` has the detailed conventions for working in this codebase.
 
-## How it connects to the API
 
-`next.config.ts` rewrites `/api/*` to `NEXT_PUBLIC_API_URL`. The browser only ever calls this site's own `/api` path, which keeps the session cookie first-party. Server components call the API directly.
-
-Don't add routes under `src/app/api` or send browser requests straight to the API, because either one breaks this setup.
-
-## Deployment
-
-1. Deploy the API first.
-2. Set `NEXT_PUBLIC_API_URL` on the client to `https://<api-domain>/api`, then build.
-3. On the API, set both `CLIENT_URL` and `BETTER_AUTH_URL` to this site's URL.
-
-The [server README](https://github.com/hasnat-sumit/studio-space-server#deployment) has the full list of API settings.
-
-## Known limitations
-
-- **Payments:** nothing is charged. Payment is arranged with the host.
-- **Photos:** hosts paste `images.unsplash.com` links, because there are no file uploads.
-- **Password reset:** "Forgot password" is a placeholder, because no email service is connected.
-- **Homepage claims:** the figures in `src/components/home/hero.tsx` ("2,400+" studios, "120" cities, "12k+" bookings) and its "verified" wording are placeholders, not real data.
