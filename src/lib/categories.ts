@@ -22,7 +22,7 @@ export interface StudioCategoryConfig {
 export const STUDIO_CATEGORIES: readonly StudioCategoryConfig[] = [
   {
     slug: "photography",
-    name: "Photography Studios",
+    name: "Photo Studios",
     description: "Daylight cycloramas, seamless backdrops, and pro strobe kits.",
     icon: CameraIcon,
     image: unsplash("photo-1452587925148-ce544e77e70d", 1200),

@@ -3,12 +3,8 @@ import Link from "next/link";
 import { ArrowUpRightIcon } from "lucide-react";
 import { STUDIO_CATEGORIES, categoryHref } from "@/lib/categories";
 import { SectionHeading } from "@/components/shared/section-heading";
-import { cn } from "@/lib/utils";
 
-const CATEGORY_IMAGE_SIZES = {
-  feature: "(min-width: 1024px) 66vw, (min-width: 640px) 92vw, 92vw",
-  default: "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 92vw",
-} as const;
+const CATEGORY_IMAGE_SIZES = "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 92vw";
 
 export function CategoryExplorer() {
   return (
@@ -16,26 +12,23 @@ export function CategoryExplorer() {
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeading
           eyebrow="Browse"
-          title="Explore by Category"
+          title="Browse by Studio Categories"
           description="Five kinds of creative space, each equipped for the work you make."
           align="center"
         />
 
-        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {STUDIO_CATEGORIES.map((category, index) => (
+        <div className="mt-12 flex flex-wrap justify-center gap-4">
+          {STUDIO_CATEGORIES.map((category) => (
             <Link
               key={category.slug}
               href={categoryHref(category.slug)}
-              className={cn(
-                "group relative flex h-64 items-end overflow-hidden rounded-2xl ring-1 ring-border outline-none focus-visible:ring-3 focus-visible:ring-brand-accent/40 sm:h-72",
-                index === 0 && "sm:col-span-2"
-              )}
+              className="group relative flex h-64 w-full items-end overflow-hidden rounded-2xl ring-1 ring-border outline-none focus-visible:ring-3 focus-visible:ring-brand-accent/40 sm:h-72 sm:w-[calc(50%-0.5rem)] lg:w-[calc((100%-2rem)/3)]"
             >
               <Image
                 src={category.image}
                 alt={category.imageAlt}
                 fill
-                sizes={index === 0 ? CATEGORY_IMAGE_SIZES.feature : CATEGORY_IMAGE_SIZES.default}
+                sizes={CATEGORY_IMAGE_SIZES}
                 className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
               />
               {/* Legibility scrim over photography */}
