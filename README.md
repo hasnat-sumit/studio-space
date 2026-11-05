@@ -1,19 +1,28 @@
-# StudioSpace Client
+# StudioSpace
 
-The web frontend for StudioSpace, a peer-to-peer marketplace for booking creative spaces by the hour: photography studios, sound stages, podcast rooms, music suites, and art workshops.
+**Live site:** add the deployed URL here
+
+StudioSpace is a peer-to-peer marketplace for booking creative spaces by the hour: photo studios, sound stages, podcast rooms, music suites, and art workshops.
 
 There is one account type, so every user can both book studios and list their own.
 
 The API lives in a separate repo: [studio-space-server](https://github.com/hasnat-sumit/studio-space-server).
 
+## Examiner test credentials
+
+| Email | Password |
+| --- | --- |
+| `examiner@studiospace.dev` | `Examiner123` |
+
 ## Features
 
 - **Browse:** search and filter studios by category, price, and capacity, with shareable URLs.
-- **Studio pages:** photo gallery, amenities, host details, reviews, and availability.
-- **Booking:** request a time slot and see an estimated total. Times that are already booked are flagged.
-- **Accounts:** email and password sign-in, plus optional Google sign-in.
-- **Dashboard:** hosting and booking stats, listing management, booking requests, and profile settings.
-- **Light and dark themes**, and layouts that work at phone width.
+- **Studio pages:** photo carousel, amenities, host details, reviews, and availability.
+- **Booking:** request a time slot and see the total up front. Overlapping bookings are rejected with a clear message.
+- **Listings:** add, update, and delete your own studios, and upload photos to imgbb or paste an image URL.
+- **Accounts:** email and password or Google sign-in, with the session kept in a signed JWT in an HttpOnly cookie.
+- **Dashboard:** hosting and booking stats, booking requests, and profile settings.
+- **Light and dark themes**, and layouts that work on phones, tablets, and desktops.
 
 ## Tech stack
 
@@ -21,6 +30,7 @@ The API lives in a separate repo: [studio-space-server](https://github.com/hasna
 - React 19 and TypeScript
 - Tailwind CSS v4
 - shadcn/ui on Base UI
+- Swiper
 - Better Auth client
 
 ## Getting started
@@ -68,12 +78,13 @@ If it is unset, public pages show sample data and sign-in is unavailable. This i
 | `/studios/[id]` | Studio details, booking, and reviews | To book or review |
 | `/how-it-works` | How It Works | No |
 | `/about` | About Us | No |
-| `/login`, `/register` | Sign in and create an account | No |
+| `/terms` | Terms of Use | No |
+| `/login`, `/register` | Log in and create an account | No |
 | `/dashboard` | Overview | Yes |
-| `/dashboard/studios` | My Studio Listings | Yes |
-| `/dashboard/studios/new` | Add New Studio | Yes |
-| `/dashboard/studios/[id]/edit` | Edit a listing | Yes |
-| `/dashboard/bookings` | My Bookings and requests for my studios | Yes |
+| `/add-studio` | Add New Studio | Yes |
+| `/my-listings` | My Studio Listings | Yes |
+| `/studios/edit/[id]` | Update a listing | Yes |
+| `/my-bookings` | My Bookings and requests for my studios | Yes |
 | `/dashboard/profile` | My Profile | Yes |
 
 ## Project structure
@@ -81,6 +92,7 @@ If it is unset, public pages show sample data and sign-in is unavailable. This i
 ```
 src/
 ├── app/            Routes and layouts, with route-specific components in _components/
+│   └── (account)/  Signed-in pages, behind one guard and sidebar
 ├── components/
 │   ├── ui/         Generated shadcn/ui primitives (don't edit by hand)
 │   ├── layout/     Navbar and footer
@@ -93,5 +105,3 @@ src/
 ```
 
 `AGENTS.md` has the detailed conventions for working in this codebase.
-
-
