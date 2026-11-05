@@ -2,7 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRightIcon, MapPinIcon, StarIcon, UsersIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
 import { categoryLabel } from "@/lib/categories";
+import { cn } from "@/lib/utils";
 import type { Studio } from "@/types/studio";
 
 const CARD_IMAGE_SIZES =
@@ -24,6 +26,21 @@ function RatingLabel({ studio }: { studio: Studio }) {
     </>
   ) : (
     "New"
+  );
+}
+
+/** Looks like a button, but it's a span: the whole card is already the link. */
+function ViewDetailsButton() {
+  return (
+    <span
+      className={cn(
+        buttonVariants({ variant: "outline" }),
+        "mt-auto w-full translate-y-3 gap-1.5 group-hover:border-brand-accent group-hover:text-brand-accent"
+      )}
+    >
+      View Details
+      <ArrowUpRightIcon className="size-4" aria-hidden="true" />
+    </span>
   );
 }
 
@@ -74,7 +91,7 @@ export function StudioCard({ studio, variant = "compact" }: StudioCardProps) {
               <span className="font-heading text-lg font-semibold text-brand-accent">
                 ${studio.hourlyRate}
               </span>
-              <span className="text-xs text-muted-foreground">/hr</span>
+              <span className="text-xs text-muted-foreground"> / hr</span>
             </p>
           </div>
 
@@ -91,16 +108,10 @@ export function StudioCard({ studio, variant = "compact" }: StudioCardProps) {
             {studio.description}
           </p>
 
-          <span className="mt-auto inline-flex items-center gap-1 border-t border-border pt-4 text-sm font-medium text-brand-accent">
-            View details
-            <ArrowUpRightIcon
-              className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-              aria-hidden="true"
-            />
-          </span>
+          <ViewDetailsButton />
         </div>
       ) : (
-        <>
+        <div className="flex flex-1 flex-col">
           <div className="mt-4 flex items-start justify-between gap-3">
             <div className="min-w-0">
               <h3 className="truncate font-heading text-base font-medium tracking-tight transition-colors group-hover:text-brand-accent sm:text-lg">
@@ -124,9 +135,11 @@ export function StudioCard({ studio, variant = "compact" }: StudioCardProps) {
             <span className="font-heading text-base font-semibold">
               ${studio.hourlyRate}
             </span>{" "}
-            <span className="text-muted-foreground">/ hour</span>
+            <span className="text-muted-foreground">/ hr</span>
           </p>
-        </>
+
+          <ViewDetailsButton />
+        </div>
       )}
     </Link>
   );
