@@ -54,7 +54,7 @@ export function HeroSlide({ slide, priority = false }: HeroSlideProps) {
 
       <div className="relative mx-auto w-full max-w-7xl px-4 sm:px-16 lg:px-20">
         <div className="max-w-2xl">
-          <p className="text-xs font-medium tracking-[0.2em] text-brand-accent uppercase">
+          <p className="text-xs font-medium tracking-[0.2em] text-cream/90 uppercase">
             {slide.eyebrow}
           </p>
           <h2 className="mt-4 font-heading text-4xl leading-[1.05] font-semibold tracking-tight text-balance text-cream sm:text-5xl lg:text-6xl">
