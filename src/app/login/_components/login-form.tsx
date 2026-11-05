@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * Login form. Signs in through Better Auth, then returns to `?next=` (read at
- * submit time, so the page itself stays static) or the dashboard.
+ * submit time, so the page itself stays static) or the home page.
  */
 export function LoginForm() {
   const router = useRouter();
@@ -36,8 +36,6 @@ export function LoginForm() {
     else if (!/^\S+@\S+\.\S+$/.test(email.trim()))
       nextErrors.email = "Enter a valid email address.";
     if (!password) nextErrors.password = "Password is required.";
-    else if (password.length < 8)
-      nextErrors.password = "Password must be at least 8 characters.";
 
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
@@ -130,10 +128,10 @@ export function LoginForm() {
         ) : (
           <LogInIcon aria-hidden="true" />
         )}
-        {submitting ? "Signing in…" : "Sign in"}
+        {submitting ? "Logging in…" : "Login"}
       </Button>
 
-      <GoogleButton label="Sign in with Google" />
+      <GoogleButton label="Continue with Google" />
 
       <div className="flex items-center gap-3">
         <Separator className="flex-1" />
@@ -150,7 +148,7 @@ export function LoginForm() {
           "h-10 text-[15px]"
         )}
       >
-        Create an account
+        Register
       </Link>
     </form>
   );
