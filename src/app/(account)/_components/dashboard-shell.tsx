@@ -14,7 +14,7 @@ import { DashboardMessage } from "./dashboard-states";
 const WRAPPER_CLASS =
   "mx-auto grid w-full max-w-7xl gap-6 px-4 py-6 sm:px-6 sm:py-10 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-10 lg:px-8";
 
-/** Auth guard + section navigation for every `/dashboard` route. */
+/** Auth guard + section navigation for every signed-in route. */
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();

@@ -174,7 +174,7 @@ export default function HowItWorksPage() {
         title="Ready to Create Something Extraordinary?"
         description="Browse verified studios near you — or open your own doors to creators and start earning by the hour."
         primary={{ label: "Explore Studios", href: "/studios" }}
-        secondary={{ label: "Become a Host", href: "/dashboard/studios/new" }}
+        secondary={{ label: "Become a Host", href: "/add-studio" }}
       />
     </div>
   );

@@ -87,7 +87,7 @@ export default function AboutPage() {
         title="Come Build the Scene With Us"
         description="Whether you shoot, record, paint, or podcast — there's a room here for you. And if you own one, there's a creator looking for it right now."
         primary={{ label: "Discover Spaces", href: "/studios" }}
-        secondary={{ label: "List Your Studio", href: "/dashboard/studios/new" }}
+        secondary={{ label: "List Your Studio", href: "/add-studio" }}
       />
     </div>
   );

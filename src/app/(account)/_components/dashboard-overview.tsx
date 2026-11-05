@@ -50,7 +50,7 @@ export function DashboardOverview() {
       description="Your bookings and listings at a glance."
       action={
         <Link
-          href="/dashboard/studios/new"
+          href="/add-studio"
           className={cn(buttonVariants(), ACCENT_BUTTON_CLASS, "gap-1.5")}
         >
           <CirclePlusIcon aria-hidden="true" />
@@ -91,21 +91,21 @@ export function DashboardOverview() {
       {heading}
 
       <StatGroup title="Hosting">
-        <StatTile label="Listings" value={String(hosting.listings)} href="/dashboard/studios" />
+        <StatTile label="Listings" value={String(hosting.listings)} href="/my-listings" />
         <StatTile
           label="Requests to review"
           value={String(hosting.pendingRequests)}
-          href="/dashboard/bookings?view=requests"
+          href="/my-bookings?view=requests"
         />
         <StatTile
           label="Upcoming sessions"
           value={String(hosting.upcomingBookings)}
-          href="/dashboard/bookings?view=requests"
+          href="/my-bookings?view=requests"
         />
         <StatTile
           label="Booked revenue"
           value={formatMoney(hosting.earnings)}
-          href="/dashboard/bookings?view=requests"
+          href="/my-bookings?view=requests"
         />
       </StatGroup>
 
@@ -113,17 +113,17 @@ export function DashboardOverview() {
         <StatTile
           label="Upcoming bookings"
           value={String(renting.upcomingBookings)}
-          href="/dashboard/bookings"
+          href="/my-bookings"
         />
         <StatTile
           label="All bookings"
           value={String(renting.totalBookings)}
-          href="/dashboard/bookings"
+          href="/my-bookings"
         />
         <StatTile
           label="Booked value"
           value={formatMoney(renting.totalSpent)}
-          href="/dashboard/bookings"
+          href="/my-bookings"
         />
       </StatGroup>
 
@@ -153,8 +153,8 @@ export function DashboardOverview() {
                   <Link
                     href={
                       booking.role === "host"
-                        ? "/dashboard/bookings?view=requests"
-                        : "/dashboard/bookings"
+                        ? "/my-bookings?view=requests"
+                        : "/my-bookings"
                     }
                     className="font-medium outline-none hover:underline focus-visible:ring-3 focus-visible:ring-brand-accent/40"
                   >

@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import { DashboardShell, DashboardShellFallback } from "./_components/dashboard-shell";
+import { DashboardShell, DashboardShellFallback } from "@/app/(account)/_components/dashboard-shell";
 
 export const metadata: Metadata = {
   title: "Dashboard - StudioSpace",
@@ -8,12 +8,12 @@ export const metadata: Metadata = {
 };
 
 /**
- * Everything under `/dashboard` is client-rendered behind the auth guard in
+ * Every signed-in page is client-rendered behind the auth guard in
  * `DashboardShell`. The guard is for UX only: the API authorizes every request.
  * Suspense is required because the shell reads `usePathname()` (see the note on
  * dynamic params in `src/app/layout.tsx`).
  */
-export default function DashboardLayout({ children }: LayoutProps<"/dashboard">) {
+export default function AccountLayout({ children }: { children: React.ReactNode }) {
   return (
     <Suspense fallback={<DashboardShellFallback />}>
       <DashboardShell>{children}</DashboardShell>

@@ -20,15 +20,15 @@ const FOOTER_COLUMNS: readonly FooterColumn[] = [
     heading: "For Hosts",
     links: [
       { label: "Become a Host", href: "/#host" },
-      { label: "List Your Studio", href: "/dashboard/studios/new" },
-      { label: "My Listings", href: "/dashboard/studios" },
+      { label: "List Your Studio", href: "/add-studio" },
+      { label: "My Listings", href: "/my-listings" },
     ],
   },
   {
     heading: "Account",
     links: [
       { label: "Dashboard", href: "/dashboard" },
-      { label: "My Bookings", href: "/dashboard/bookings" },
+      { label: "My Bookings", href: "/my-bookings" },
       { label: "Login", href: "/login" },
       { label: "Register", href: "/register" },
     ],

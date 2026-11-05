@@ -16,14 +16,14 @@ import { ApiError } from "@/lib/api/client";
 import { formatHours, formatMoney, slotLabel } from "@/lib/booking";
 import { cn } from "@/lib/utils";
 import type { Booking, BookingAction } from "@/types/booking";
-import { BookingStatusBadge } from "../../_components/booking-status-badge";
+import { BookingStatusBadge } from "@/app/(account)/_components/booking-status-badge";
 import {
   ACCENT_BUTTON_CLASS,
   DashboardError,
   DashboardHeading,
   DashboardListSkeleton,
   DashboardMessage,
-} from "../../_components/dashboard-states";
+} from "@/app/(account)/_components/dashboard-states";
 
 const PAGE_SIZE = 10;
 /** The API's maximum `limit`. */
@@ -300,7 +300,7 @@ export function MyBookings() {
                 description="When someone asks to book one of your studios, you can confirm or decline it here."
                 action={
                   <Link
-                    href="/dashboard/studios"
+                    href="/my-listings"
                     className={cn(buttonVariants({ variant: "outline" }))}
                   >
                     View my listings

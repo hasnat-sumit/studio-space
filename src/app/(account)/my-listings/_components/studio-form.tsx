@@ -23,7 +23,7 @@ import { AMENITIES, AMENITY_IDS } from "@/lib/amenities";
 import { STUDIO_CATEGORIES } from "@/lib/categories";
 import { cn } from "@/lib/utils";
 import type { Studio, StudioAmenityId, StudioCategory } from "@/types/studio";
-import { ACCENT_BUTTON_CLASS } from "../../_components/dashboard-states";
+import { ACCENT_BUTTON_CLASS } from "@/app/(account)/_components/dashboard-states";
 
 const CATEGORY_ITEMS = STUDIO_CATEGORIES.map((category) => ({
   value: category.slug,
@@ -159,7 +159,7 @@ export function StudioForm({ studio }: StudioFormProps) {
         await createStudio(input);
         toast.success("Your studio is live");
       }
-      router.push("/dashboard/studios");
+      router.push("/my-listings");
     } catch (cause) {
       setSubmitting(false);
       if (cause instanceof ApiError) {
@@ -394,7 +394,7 @@ export function StudioForm({ studio }: StudioFormProps) {
 
       <div className="flex flex-wrap justify-end gap-3">
         <Link
-          href="/dashboard/studios"
+          href="/my-listings"
           className={cn(buttonVariants({ variant: "outline" }), "h-11 px-6")}
         >
           Cancel

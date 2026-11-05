@@ -138,7 +138,7 @@ export function BookingPanel({ studio }: BookingPanelProps) {
         description: `${studio.host.name} will confirm or decline it. Track it in My Bookings.`,
         action: {
           label: "View",
-          onClick: () => router.push("/dashboard/bookings"),
+          onClick: () => router.push("/my-bookings"),
         },
       });
       setOpen(false);

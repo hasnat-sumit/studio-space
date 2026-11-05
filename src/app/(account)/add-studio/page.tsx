@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { StudioForm } from "../_components/studio-form";
-import { DashboardHeading } from "../../_components/dashboard-states";
+import { StudioForm } from "@/app/(account)/my-listings/_components/studio-form";
+import { DashboardHeading } from "@/app/(account)/_components/dashboard-states";
 
 export const metadata: Metadata = { title: "Add New Studio - StudioSpace" };
 

@@ -15,7 +15,7 @@ import {
   DashboardHeading,
   DashboardListSkeleton,
   DashboardMessage,
-} from "../../_components/dashboard-states";
+} from "@/app/(account)/_components/dashboard-states";
 
 export function EditStudio() {
   const { id } = useParams<{ id: string }>();
@@ -36,7 +36,7 @@ export function EditStudio() {
         title="This isn't your listing"
         description="You can only edit studios you've listed yourself."
         action={
-          <Link href="/dashboard/studios" className={cn(buttonVariants({ variant: "outline" }))}>
+          <Link href="/my-listings" className={cn(buttonVariants({ variant: "outline" }))}>
             Back to my listings
           </Link>
         }

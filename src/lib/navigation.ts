@@ -28,15 +28,15 @@ export const NAV_LINKS: readonly NavLink[] = [
 /** Signed-in account links (avatar dropdown + mobile menu). */
 export const ACCOUNT_LINKS: readonly NavLink[] = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboardIcon },
-  { label: "Add New Studio", href: "/dashboard/studios/new", icon: CirclePlusIcon },
-  { label: "My Studio Listings", href: "/dashboard/studios", icon: BuildingIcon },
-  { label: "My Bookings", href: "/dashboard/bookings", icon: CalendarCheckIcon },
+  { label: "Add New Studio", href: "/add-studio", icon: CirclePlusIcon },
+  { label: "My Studio Listings", href: "/my-listings", icon: BuildingIcon },
+  { label: "My Bookings", href: "/my-bookings", icon: CalendarCheckIcon },
   { label: "My Profile", href: "/dashboard/profile", icon: UserRoundIcon },
 ];
 
 /**
  * The account link for `pathname`. The most specific match wins, so
- * `/dashboard/studios/new` highlights only "Add New Studio", not its parents.
+ * `/add-studio` highlights only "Add New Studio", not its parents.
  */
 export function activeAccountHref(pathname: string): string | null {
   const matches = ACCOUNT_LINKS.filter((link) => isActivePath(link.href, pathname));

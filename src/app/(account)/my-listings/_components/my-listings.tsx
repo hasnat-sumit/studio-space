@@ -27,7 +27,7 @@ import {
   DashboardHeading,
   DashboardListSkeleton,
   DashboardMessage,
-} from "../../_components/dashboard-states";
+} from "@/app/(account)/_components/dashboard-states";
 
 export function MyListings() {
   const { data: studios, error, isLoading, reload } = useApiData(getMyStudios);
@@ -54,7 +54,7 @@ export function MyListings() {
 
   const addStudioLink = (
     <Link
-      href="/dashboard/studios/new"
+      href="/add-studio"
       className={cn(buttonVariants(), ACCENT_BUTTON_CLASS, "gap-1.5")}
     >
       <CirclePlusIcon aria-hidden="true" />
@@ -125,7 +125,7 @@ export function MyListings() {
                     View
                   </Link>
                   <Link
-                    href={`/dashboard/studios/${studio.id}/edit`}
+                    href={`/studios/edit/${studio.id}`}
                     className={cn(buttonVariants({ variant: "outline", size: "sm" }), "gap-1.5")}
                   >
                     <PencilIcon aria-hidden="true" />

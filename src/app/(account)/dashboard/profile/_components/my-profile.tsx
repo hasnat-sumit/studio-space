@@ -19,7 +19,7 @@ import {
   DashboardError,
   DashboardHeading,
   DashboardListSkeleton,
-} from "../../_components/dashboard-states";
+} from "@/app/(account)/_components/dashboard-states";
 
 const SECTION_CLASS = "flex flex-col gap-5 rounded-2xl border border-border bg-card p-5 sm:p-6";
 
