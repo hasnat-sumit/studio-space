@@ -17,28 +17,28 @@ interface Step {
 const STEPS: readonly Step[] = [
   {
     number: "01",
-    title: "Discover your space",
+    title: "Discover Spaces",
     description:
-      "Browse verified studios by category, city, and the gear that comes with them.",
+      "Browse studios by category, city, and the gear that comes with them.",
     icon: SearchIcon,
   },
   {
     number: "02",
-    title: "Choose your schedule",
+    title: "Select Shoot Hours",
     description:
-      "See real-time availability and hold your favourite hours in seconds.",
+      "Pick a date and time, see what's already booked, and check the total up front.",
     icon: CalendarDaysIcon,
   },
   {
     number: "03",
-    title: "Book securely",
+    title: "Book Instantly",
     description:
-      "Pay through protected checkout with clear cancellation terms.",
+      "Send your request in one click, then track the host's answer in My Bookings.",
     icon: ShieldCheckIcon,
   },
   {
     number: "04",
-    title: "Create something amazing",
+    title: "Create & Produce",
     description:
       "Show up, plug in, and make the work you've been waiting to make.",
     icon: SparklesIcon,
@@ -50,8 +50,8 @@ export function HowItWorks() {
     <section id="how-it-works" className="py-20 sm:py-24">
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeading
-          eyebrow="How it works"
-          title="From idea to keys in hand"
+          eyebrow="How booking works"
+          title="How Booking Works"
           description="Four simple steps between you and the room where it happens."
           align="center"
         />
