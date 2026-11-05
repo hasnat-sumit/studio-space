@@ -13,6 +13,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { getProfile, updateProfile } from "@/lib/api/account";
 import { ApiError } from "@/lib/api/client";
 import { authClient } from "@/lib/auth-client";
+import { passwordProblem } from "@/lib/password";
 import type { UserProfile } from "@/types/auth";
 import {
   ACCENT_BUTTON_CLASS,
@@ -177,8 +178,8 @@ function PasswordForm() {
 
     const nextErrors: Record<string, string> = {};
     if (!currentPassword) nextErrors.currentPassword = "Enter your current password.";
-    if (newPassword.length < 8)
-      nextErrors.newPassword = "Password must be at least 8 characters.";
+    const problem = passwordProblem(newPassword);
+    if (problem) nextErrors.newPassword = problem;
     if (confirmPassword !== newPassword)
       nextErrors.confirmPassword = "Passwords don't match.";
     setErrors(nextErrors);

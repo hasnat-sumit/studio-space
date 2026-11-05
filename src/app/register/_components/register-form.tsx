@@ -10,26 +10,34 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { useAuth } from "@/hooks/use-auth";
-import { authClient, safeNextPath } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth-client";
+import { passwordProblem } from "@/lib/password";
 import { cn } from "@/lib/utils";
 
+function isHttpUrl(value: string): boolean {
+  try {
+    const { protocol } = new URL(value);
+    return protocol === "https:" || protocol === "http:";
+  } catch {
+    return false;
+  }
+}
+
 /**
- * Registration form. Creates the account through Better Auth, which also starts
- * the session, then returns to `?next=` or the dashboard.
+ * Registration form. Creates the account through Better Auth, then sends the
+ * user to log in, keeping `?next=` so they still end up where they were heading.
  */
 export function RegisterForm() {
   const router = useRouter();
-  const { refresh } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [photoUrl, setPhotoUrl] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState<{
     name?: string;
     email?: string;
+    photoUrl?: string;
     password?: string;
-    confirmPassword?: string;
   }>({});
   const [submitting, setSubmitting] = useState(false);
 
@@ -41,13 +49,10 @@ export function RegisterForm() {
     if (!email.trim()) nextErrors.email = "Email is required.";
     else if (!/^\S+@\S+\.\S+$/.test(email.trim()))
       nextErrors.email = "Enter a valid email address.";
-    if (!password) nextErrors.password = "Password is required.";
-    else if (password.length < 8)
-      nextErrors.password = "Password must be at least 8 characters.";
-    if (!confirmPassword)
-      nextErrors.confirmPassword = "Confirm your password.";
-    else if (confirmPassword !== password)
-      nextErrors.confirmPassword = "Passwords don't match.";
+    if (photoUrl.trim() && !isHttpUrl(photoUrl.trim()))
+      nextErrors.photoUrl = "Enter a full link, starting with https://.";
+    const problem = passwordProblem(password);
+    if (problem) nextErrors.password = problem;
 
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
@@ -57,6 +62,7 @@ export function RegisterForm() {
       name: name.trim(),
       email: email.trim(),
       password,
+      ...(photoUrl.trim() ? { image: photoUrl.trim() } : {}),
     });
 
     if (error) {
@@ -67,16 +73,14 @@ export function RegisterForm() {
       return;
     }
 
-    await refresh();
-    toast.success("Welcome to StudioSpace");
-    const next = new URLSearchParams(window.location.search).get("next");
-    router.replace(safeNextPath(next));
+    toast.success("Account created", { description: "Log in to get started." });
+    router.replace(`/login${window.location.search}`);
   }
 
   return (
     <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
       <div className="flex flex-col gap-2">
-        <Label htmlFor="name">Full name</Label>
+        <Label htmlFor="name">Name</Label>
         <Input
           id="name"
           type="text"
@@ -116,45 +120,47 @@ export function RegisterForm() {
       </div>
 
       <div className="flex flex-col gap-2">
+        <Label htmlFor="photo-url">Photo URL (optional)</Label>
+        <Input
+          id="photo-url"
+          type="url"
+          autoComplete="photo"
+          placeholder="https://example.com/you.jpg"
+          value={photoUrl}
+          onChange={(e) => setPhotoUrl(e.target.value)}
+          aria-invalid={errors.photoUrl ? true : undefined}
+          aria-describedby={errors.photoUrl ? "photo-url-error" : undefined}
+          className="h-10"
+        />
+        {errors.photoUrl ? (
+          <p id="photo-url-error" className="text-sm text-destructive">
+            {errors.photoUrl}
+          </p>
+        ) : null}
+      </div>
+
+      <div className="flex flex-col gap-2">
         <Label htmlFor="password">Password</Label>
         <Input
           id="password"
           type="password"
           autoComplete="new-password"
-          placeholder="At least 8 characters"
+          placeholder="At least 6 characters"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           aria-invalid={errors.password ? true : undefined}
-          aria-describedby={errors.password ? "password-error" : undefined}
+          aria-describedby={errors.password ? "password-error" : "password-hint"}
           className="h-10"
         />
         {errors.password ? (
           <p id="password-error" className="text-sm text-destructive">
             {errors.password}
           </p>
-        ) : null}
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="confirm-password">Confirm password</Label>
-        <Input
-          id="confirm-password"
-          type="password"
-          autoComplete="new-password"
-          placeholder="Re-enter your password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          aria-invalid={errors.confirmPassword ? true : undefined}
-          aria-describedby={
-            errors.confirmPassword ? "confirm-password-error" : undefined
-          }
-          className="h-10"
-        />
-        {errors.confirmPassword ? (
-          <p id="confirm-password-error" className="text-sm text-destructive">
-            {errors.confirmPassword}
+        ) : (
+          <p id="password-hint" className="text-sm text-muted-foreground">
+            Use at least 6 characters, with an uppercase and a lowercase letter.
           </p>
-        ) : null}
+        )}
       </div>
 
       <Button
@@ -167,10 +173,10 @@ export function RegisterForm() {
         ) : (
           <UserPlusIcon aria-hidden="true" />
         )}
-        {submitting ? "Creating account…" : "Create account"}
+        {submitting ? "Registering…" : "Register"}
       </Button>
 
-      <GoogleButton label="Sign up with Google" />
+      <GoogleButton label="Continue with Google" />
 
       <div className="flex items-center gap-3">
         <Separator className="flex-1" />
@@ -187,7 +193,7 @@ export function RegisterForm() {
           "h-10 text-[15px]"
         )}
       >
-        Sign in instead
+        Login
       </Link>
     </form>
   );
