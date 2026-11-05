@@ -34,7 +34,7 @@ export function EditStudio() {
       <DashboardMessage
         icon={ShieldAlertIcon}
         title="This isn't your listing"
-        description="You can only edit studios you've listed yourself."
+        description="You can only update studios you've listed yourself."
         action={
           <Link href="/my-listings" className={cn(buttonVariants({ variant: "outline" }))}>
             Back to my listings
@@ -49,7 +49,7 @@ export function EditStudio() {
   return (
     <>
       <DashboardHeading
-        title={studio ? `Edit ${studio.title}` : "Edit studio"}
+        title={studio ? `Update ${studio.title}` : "Update studio"}
         description="Changes go live straight away. Existing bookings keep the price they were made at."
       />
       <div className="mt-8">{body}</div>

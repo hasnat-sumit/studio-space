@@ -94,6 +94,19 @@ export function updateProfile(
   return apiRequest<UserProfile>("/users/me", { method: "PATCH", body: input });
 }
 
+/** Stores an image on imgbb through the API and returns its public URL. */
+export async function uploadImage(dataUrl: string): Promise<string> {
+  const { url } = await apiRequest<{ url: string }>("/uploads/image", {
+    method: "POST",
+    body: { image: dataUrl },
+  });
+  return url;
+}
+
+export function subscribeToNewsletter(email: string): Promise<{ subscribed: boolean }> {
+  return apiRequest("/newsletter", { method: "POST", body: { email } });
+}
+
 export function deleteReview(id: string): Promise<void> {
   return apiRequest<void>(`/reviews/${encodeURIComponent(id)}`, { method: "DELETE" });
 }

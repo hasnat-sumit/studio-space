@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Loader2Icon, PlusIcon, Trash2Icon } from "lucide-react";
+import { Loader2Icon, PlusIcon, Trash2Icon, UploadIcon } from "lucide-react";
 import { toast } from "sonner";
 import { FormField } from "@/components/shared/form-field";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -17,7 +17,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { createStudio, updateStudio, type StudioInput } from "@/lib/api/account";
+import { useAuth } from "@/hooks/use-auth";
+import { createStudio, updateStudio, uploadImage, type StudioInput } from "@/lib/api/account";
 import { ApiError } from "@/lib/api/client";
 import { AMENITIES, AMENITY_IDS } from "@/lib/amenities";
 import { STUDIO_CATEGORIES } from "@/lib/categories";
@@ -31,7 +32,9 @@ const CATEGORY_ITEMS = STUDIO_CATEGORIES.map((category) => ({
 }));
 
 const MAX_PHOTOS = 8;
-const PHOTO_HOST = "images.unsplash.com";
+const PHOTO_HOSTS = ["images.unsplash.com", "i.ibb.co"];
+/** The API's limit: base64 makes a file about a third bigger on the way there. */
+const MAX_UPLOAD_BYTES = 3 * 1024 * 1024;
 
 type Errors = Record<string, string | undefined>;
 
@@ -50,10 +53,19 @@ interface StudioFormProps {
 function isAllowedPhotoUrl(value: string): boolean {
   try {
     const url = new URL(value);
-    return url.protocol === "https:" && url.hostname === PHOTO_HOST;
+    return url.protocol === "https:" && PHOTO_HOSTS.includes(url.hostname);
   } catch {
     return false;
   }
+}
+
+function readAsDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
 }
 
 /** The form is long, so bring the first problem into view once errors have rendered. */
@@ -70,6 +82,7 @@ function focusFirstError() {
 /** Create/edit form for a listing. The API re-validates everything it receives. */
 export function StudioForm({ studio }: StudioFormProps) {
   const router = useRouter();
+  const { user } = useAuth();
   const [title, setTitle] = useState(studio?.title ?? "");
   const [category, setCategory] = useState<StudioCategory | "">(studio?.category ?? "");
   const [location, setLocation] = useState(studio?.location ?? "");
@@ -87,6 +100,27 @@ export function StudioForm({ studio }: StudioFormProps) {
   const [nextKey, setNextKey] = useState(photos.length);
   const [errors, setErrors] = useState<Errors>({});
   const [submitting, setSubmitting] = useState(false);
+  const [uploadingKey, setUploadingKey] = useState<number | null>(null);
+
+  async function handleUpload(key: number, file: File | undefined) {
+    if (!file) return;
+    if (file.size > MAX_UPLOAD_BYTES) {
+      toast.error("That image is too big", { description: "Images must be 3 MB or smaller." });
+      return;
+    }
+
+    setUploadingKey(key);
+    try {
+      updatePhoto(key, "src", await uploadImage(await readAsDataUrl(file)));
+      toast.success("Photo uploaded");
+    } catch (cause) {
+      toast.error("Couldn't upload that photo", {
+        description: cause instanceof ApiError ? cause.message : "Please try again.",
+      });
+    } finally {
+      setUploadingKey(null);
+    }
+  }
 
   function updatePhoto(key: number, field: "src" | "alt", value: string) {
     setPhotos((rows) => rows.map((row) => (row.key === key ? { ...row, [field]: value } : row)));
@@ -116,7 +150,7 @@ export function StudioForm({ studio }: StudioFormProps) {
       next.description = "Summary must be at least 10 characters.";
     if (!overview.trim()) next.overview = "Add an overview.";
     if (photos.some((photo) => !isAllowedPhotoUrl(photo.src.trim())))
-      next.gallery = `Each photo needs an https://${PHOTO_HOST} link.`;
+      next.gallery = "Upload each photo, or paste an https://images.unsplash.com or https://i.ibb.co link.";
     else if (photos.some((photo) => !photo.alt.trim()))
       next.gallery = "Describe each photo for people using screen readers.";
     return next;
@@ -178,6 +212,16 @@ export function StudioForm({ studio }: StudioFormProps) {
 
   return (
     <form onSubmit={(event) => void handleSubmit(event)} noValidate className="flex flex-col gap-8">
+      <fieldset className="grid gap-5 rounded-2xl border border-border bg-card p-5 sm:grid-cols-2 sm:p-6">
+        <legend className="px-1 font-heading text-lg font-medium">Your host details</legend>
+        <FormField id="host-name" label="Name">
+          <Input id="host-name" value={user?.name ?? ""} readOnly className="h-10 bg-muted" />
+        </FormField>
+        <FormField id="host-email" label="Email">
+          <Input id="host-email" value={user?.email ?? ""} readOnly className="h-10 bg-muted" />
+        </FormField>
+      </fieldset>
+
       <fieldset className="flex flex-col gap-5 rounded-2xl border border-border bg-card p-5 sm:p-6">
         <legend className="px-1 font-heading text-lg font-medium">The basics</legend>
 
@@ -331,22 +375,22 @@ export function StudioForm({ studio }: StudioFormProps) {
       <fieldset className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5 sm:p-6">
         <legend className="px-1 font-heading text-lg font-medium">Photos</legend>
         <p className="text-sm text-muted-foreground">
-          The first photo is your cover image. Paste links from {PHOTO_HOST} for now; direct
-          uploads aren&apos;t available yet.
+          The first photo is your cover image. Upload an image of up to 3 MB, or paste a link from
+          images.unsplash.com or i.ibb.co.
         </p>
 
         {photos.map((photo, index) => (
           <div
             key={photo.key}
-            className="grid gap-3 rounded-xl border border-border p-4 sm:grid-cols-[1fr_1fr_auto] sm:items-end"
+            className="grid gap-3 rounded-xl border border-border p-4 sm:grid-cols-[1fr_1fr_auto_auto] sm:items-end"
           >
-            <FormField id={`photo-src-${photo.key}`} label={`Photo ${index + 1} link`}>
+            <FormField id={`photo-src-${photo.key}`} label={`Photo ${index + 1} image URL`}>
               <Input
                 id={`photo-src-${photo.key}`}
                 type="url"
                 value={photo.src}
                 onChange={(e) => updatePhoto(photo.key, "src", e.target.value)}
-                placeholder={`https://${PHOTO_HOST}/photo-…`}
+                placeholder="https://images.unsplash.com/photo-…"
                 className="h-10"
               />
             </FormField>
@@ -360,6 +404,33 @@ export function StudioForm({ studio }: StudioFormProps) {
                 className="h-10"
               />
             </FormField>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={uploadingKey !== null}
+              nativeButton={false}
+              render={<label />}
+              className="h-10 cursor-pointer gap-1.5"
+            >
+              {uploadingKey === photo.key ? (
+                <Loader2Icon className="animate-spin" aria-hidden="true" />
+              ) : (
+                <UploadIcon aria-hidden="true" />
+              )}
+              {uploadingKey === photo.key ? "Uploading…" : "Upload"}
+              <input
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/gif"
+                aria-label={`Upload photo ${index + 1}`}
+                disabled={uploadingKey !== null}
+                className="sr-only"
+                onChange={(event) => {
+                  void handleUpload(photo.key, event.target.files?.[0]);
+                  // Lets the same file be chosen again after a failed upload.
+                  event.target.value = "";
+                }}
+              />
+            </Button>
             <Button
               type="button"
               variant="outline"
@@ -401,11 +472,11 @@ export function StudioForm({ studio }: StudioFormProps) {
         </Link>
         <Button
           type="submit"
-          disabled={submitting}
+          disabled={submitting || uploadingKey !== null}
           className={cn(ACCENT_BUTTON_CLASS, "h-11 gap-2 px-6 text-[15px]")}
         >
           {submitting ? <Loader2Icon className="animate-spin" aria-hidden="true" /> : null}
-          {studio ? "Save changes" : "Publish listing"}
+          {studio ? "Update listing" : "Publish listing"}
         </Button>
       </div>
     </form>

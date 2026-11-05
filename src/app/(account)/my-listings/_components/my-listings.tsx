@@ -66,7 +66,7 @@ export function MyListings() {
     <>
       <DashboardHeading
         title="My Studio Listings"
-        description="Edit your spaces, check how they're rated, and keep them up to date."
+        description="Update your spaces, check how they're rated, and keep them up to date."
         action={studios?.length ? addStudioLink : undefined}
       />
 
@@ -129,7 +129,7 @@ export function MyListings() {
                     className={cn(buttonVariants({ variant: "outline", size: "sm" }), "gap-1.5")}
                   >
                     <PencilIcon aria-hidden="true" />
-                    Edit
+                    Update
                   </Link>
                   <Button
                     type="button"
