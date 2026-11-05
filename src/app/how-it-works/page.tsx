@@ -22,7 +22,7 @@ import { unsplash } from "@/lib/images";
 export const metadata: Metadata = {
   title: "How It Works - StudioSpace",
   description:
-    "Learn how to find, book, and create in verified studios — and how to list your own space and earn by the hour on StudioSpace.",
+    "Learn how to find, book, and create in studios — and how to list your own space and earn by the hour on StudioSpace.",
 };
 
 const HERO_IMAGE = unsplash("photo-1511379938547-c1f69419868d", 1200);
@@ -33,7 +33,7 @@ const CREATOR_STEPS: readonly Step[] = [
     number: "01",
     title: "Discover Your Space",
     description:
-      "Search verified studios by category, neighborhood, and the gear that comes with them — from daylight cycloramas to podcast booths.",
+      "Search studios by category, neighborhood, and the gear that comes with them — from daylight cycloramas to podcast booths.",
     icon: SearchIcon,
   },
   {
@@ -72,7 +72,7 @@ const HOST_STEPS: readonly Step[] = [
     number: "02",
     title: "Showcase Your Space",
     description:
-      "Upload photos that sell the light and the layout. Honest, verified listings with real imagery get booked faster.",
+      "Upload photos that sell the light and the layout. Honest listings with real imagery get booked faster.",
     icon: CameraIcon,
   },
   {
@@ -86,7 +86,7 @@ const HOST_STEPS: readonly Step[] = [
     number: "04",
     title: "Earn by Sharing",
     description:
-      "Get paid for hours you're not using. Payouts land after each booking — average hosts earn $1,200 a month.",
+      "Earn from hours you're not using. You set the rate, and you arrange payment directly with each creator.",
     icon: BanknoteIcon,
   },
 ];
@@ -114,7 +114,7 @@ const REASONS: readonly Feature[] = [
   {
     title: "Community of creators and hosts",
     description:
-      "Verified hosts, reviewed spaces, and a creative community that turns empty rooms into working studios.",
+      "Real hosts, reviewed spaces, and a creative community that turns empty rooms into working studios.",
     icon: HeartHandshakeIcon,
   },
 ];
@@ -137,7 +137,7 @@ export default function HowItWorksPage() {
             <span className="text-brand-accent">Your Creation.</span>
           </>
         }
-        description="StudioSpace is where creators find the room their idea needs — verified photo studios, sound stages, podcast booths, and music suites, booked by the hour. Here's the whole journey, from first search to finished work."
+        description="StudioSpace is where creators find the room their idea needs — photo studios, sound stages, podcast booths, and music suites, booked by the hour. Here's the whole journey, from first search to finished work."
         image={{
           src: HERO_IMAGE,
           alt: "Sunlit home music studio with guitars, a keyboard, and a microphone by the window",
@@ -172,7 +172,7 @@ export default function HowItWorksPage() {
       <CtaBand
         eyebrow="Ready when you are"
         title="Ready to Create Something Extraordinary?"
-        description="Browse verified studios near you — or open your own doors to creators and start earning by the hour."
+        description="Browse studios near you — or open your own doors to creators and start earning by the hour."
         primary={{ label: "Explore Studios", href: "/studios" }}
         secondary={{ label: "Become a Host", href: "/add-studio" }}
       />

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRightIcon, BanknoteIcon, KeyRoundIcon } from "lucide-react";
+import { ArrowRightIcon, CalendarCheckIcon, KeyRoundIcon } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { unsplash } from "@/lib/images";
 import { cn } from "@/lib/utils";
@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 const HOST_IMAGE = unsplash("photo-1524758631624-e2822e304c36", 1200);
 
 const HOST_PERKS = [
-  { icon: BanknoteIcon, label: "Average hosts earn $1,200 a month" },
+  { icon: CalendarCheckIcon, label: "You confirm every booking request" },
   { icon: KeyRoundIcon, label: "You set the rules, rates, and dates" },
 ] as const;
 
@@ -26,8 +26,7 @@ export function HostCta() {
             </h2>
             <p className="mt-5 max-w-xl text-base leading-relaxed text-cream/70 text-pretty sm:text-lg">
               Turn idle hours into income. List your studio on StudioSpace and
-              earn on your own schedule — while we handle verification,
-              payouts, and bookings.
+              earn on your own schedule, with every request in one place.
             </p>
 
             <ul className="mt-6 flex flex-col gap-2.5">

@@ -42,7 +42,7 @@ const VALUES: readonly Feature[] = [
   {
     title: "Trust",
     description:
-      "Verified listings, protected bookings, and honest reviews — so both sides can show up knowing the room is real.",
+      "Clear listings, double-booking protection, and honest reviews — so both sides can show up knowing the room is real.",
     icon: ShieldCheckIcon,
   },
 ];

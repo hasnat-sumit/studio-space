@@ -46,7 +46,7 @@ export function AuthShell({
               Every great work starts with the right room.
             </p>
             <p className="mt-4 text-base leading-relaxed text-cream/70 text-pretty">
-              Verified photo studios, sound stages, podcast booths, and music
+              Photo studios, sound stages, podcast booths, and music
               suites — ready when you are.
             </p>
           </div>
