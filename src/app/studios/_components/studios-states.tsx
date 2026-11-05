@@ -1,5 +1,7 @@
+import Link from "next/link";
 import { RotateCcwIcon, SearchXIcon, TriangleAlertIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface StudiosEmptyProps {
   /** True when the visitor applied at least one refinement. */
@@ -37,7 +39,17 @@ export function StudiosEmpty({
           <RotateCcwIcon aria-hidden="true" />
           Clear all filters
         </Button>
-      ) : null}
+      ) : (
+        <Link
+          href="/add-studio"
+          className={cn(
+            buttonVariants(),
+            "mt-6 bg-brand-accent text-brand-on-accent hover:bg-brand-accent/90 hover:text-brand-on-accent"
+          )}
+        >
+          List your studio
+        </Link>
+      )}
     </div>
   );
 }
