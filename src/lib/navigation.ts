@@ -36,7 +36,7 @@ export const ACCOUNT_LINKS: readonly NavLink[] = [
 
 /**
  * The account link for `pathname`. The most specific match wins, so
- * `/add-studio` highlights only "Add New Studio", not its parents.
+ * `/dashboard/profile` highlights only "My Profile", not its parent.
  */
 export function activeAccountHref(pathname: string): string | null {
   const matches = ACCOUNT_LINKS.filter((link) => isActivePath(link.href, pathname));
@@ -49,5 +49,7 @@ export function activeAccountHref(pathname: string): string | null {
 /** True when `pathname` is `href` or a child route of it (Home only matches exactly). */
 export function isActivePath(href: string, pathname: string): boolean {
   if (href === "/") return pathname === "/";
+  // The edit page's URL sits under /studios, but it belongs to the host's listings.
+  if (pathname.startsWith("/studios/edit/")) return href === "/my-listings";
   return pathname === href || pathname.startsWith(`${href}/`);
 }
