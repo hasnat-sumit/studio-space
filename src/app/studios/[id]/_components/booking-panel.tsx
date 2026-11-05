@@ -60,7 +60,7 @@ interface BookingPanelProps {
 /**
  * Sticky booking card (desktop) that flows inline on mobile.
  *
- * The "Book This Workspace" CTA opens the request dialog. With a backend it
+ * The "Book Workspace Now" CTA opens the request dialog. With a backend it
  * creates a real booking request for the host to confirm; the API recalculates
  * the price and rejects any overlap. Without one it stays a labelled preview.
  */
@@ -197,7 +197,7 @@ export function BookingPanel({ studio }: BookingPanelProps) {
           onClick={handleOpen}
           className="mt-6 h-11 w-full bg-brand-accent px-6 text-[15px] text-brand-on-accent shadow-sm hover:bg-brand-accent/90 hover:text-brand-on-accent focus-visible:border-brand-accent/40 focus-visible:ring-brand-accent/30"
         >
-          {isOwnStudio ? "This is your listing" : "Book This Workspace"}
+          {isOwnStudio ? "This is your listing" : "Book Workspace Now"}
         </Button>
 
         <p className="mt-3 flex items-start gap-1.5 text-xs leading-relaxed text-muted-foreground">

@@ -1,6 +1,5 @@
 import { ClockIcon, ShieldCheckIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { getInitials } from "@/lib/utils";
 import type { Studio } from "@/types/studio";
 
@@ -11,8 +10,7 @@ interface StudioHostProps {
 /**
  * Public host card.
  *
- * Shows only what a stranger may see — the contact affordance is an explicit
- * placeholder until bookings connect private messaging.
+ * Shows only what a stranger may see. Contact details stay private.
  */
 export function StudioHost({ host }: StudioHostProps) {
   return (
@@ -46,22 +44,7 @@ export function StudioHost({ host }: StudioHostProps) {
             </span>
           </div>
         </div>
-
-        <Button
-          type="button"
-          variant="outline"
-          disabled
-          aria-disabled="true"
-          className="shrink-0 border-brand-border bg-transparent text-brand-fg hover:bg-brand-fg/10 hover:text-brand-fg dark:border-brand-border dark:bg-transparent dark:hover:bg-brand-fg/10"
-        >
-          Message host
-        </Button>
       </div>
-
-      <p className="mt-3 text-xs text-muted-foreground">
-        Host contact details stay private — messaging opens once bookings are
-        connected.
-      </p>
     </section>
   );
 }

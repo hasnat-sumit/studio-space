@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Image from "next/image";
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { StudioImage } from "@/types/studio";
 
@@ -9,13 +10,16 @@ const FEATURED_SIZES =
   "(min-width: 1024px) 1200px, (min-width: 640px) 92vw, 92vw";
 const THUMB_SIZES = "(min-width: 1024px) 300px, (min-width: 640px) 30vw, 45vw";
 
+const ARROW_CLASS =
+  "absolute top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full bg-background/85 text-foreground outline-none backdrop-blur-sm transition-colors hover:bg-background focus-visible:ring-3 focus-visible:ring-brand-accent/40";
+
 interface StudioGalleryProps {
   images: StudioImage[];
 }
 
 /**
- * Cinematic gallery: one large featured image with a crossfade into the
- * selected photo, plus a thumbnail strip. Falls back to the studio's single
+ * Gallery carousel: one large image that crossfades to the next, with previous
+ * and next buttons and a thumbnail strip. Falls back to the studio's single
  * image when no gallery is supplied.
  */
 export function StudioGallery({ images }: StudioGalleryProps) {
@@ -23,6 +27,10 @@ export function StudioGallery({ images }: StudioGalleryProps) {
   const featured = images[activeIndex] ?? images[0];
 
   if (!featured) return null;
+
+  function step(by: number) {
+    setActiveIndex((index) => (index + by + images.length) % images.length);
+  }
 
   return (
     <div>
@@ -43,6 +51,27 @@ export function StudioGallery({ images }: StudioGalleryProps) {
             )}
           />
         ))}
+
+        {images.length > 1 ? (
+          <>
+            <button
+              type="button"
+              onClick={() => step(-1)}
+              aria-label="Previous photo"
+              className={ARROW_CLASS + " left-3"}
+            >
+              <ChevronLeftIcon className="size-5" aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              onClick={() => step(1)}
+              aria-label="Next photo"
+              className={ARROW_CLASS + " right-3"}
+            >
+              <ChevronRightIcon className="size-5" aria-hidden="true" />
+            </button>
+          </>
+        ) : null}
 
         {images.length > 1 ? (
           <span className="absolute right-4 bottom-4 rounded-full bg-background/85 px-3 py-1 text-xs font-medium tabular-nums text-foreground backdrop-blur-sm">
