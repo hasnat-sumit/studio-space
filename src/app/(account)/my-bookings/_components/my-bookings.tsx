@@ -92,7 +92,7 @@ function BookingCard({ booking, busy, onAction }: BookingCardProps) {
               {booking.studioTitle}
             </Link>
           </h3>
-          <BookingStatusBadge status={booking.status} role={booking.role} />
+          <BookingStatusBadge status={booking.status} />
         </div>
 
         <p className="mt-1 text-sm">
@@ -156,7 +156,7 @@ function BookingCard({ booking, busy, onAction }: BookingCardProps) {
               disabled={busy}
               onClick={() => onAction(booking, "cancelled")}
             >
-              Cancel booking
+              Cancel Booking
             </Button>
           ) : null}
           {!isHost && booking.status === "completed" ? (

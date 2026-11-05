@@ -166,7 +166,7 @@ export function DashboardOverview() {
                     {booking.role === "host" ? `Guest: ${booking.guestName}` : "You're the guest"}
                   </p>
                 </div>
-                <BookingStatusBadge status={booking.status} role={booking.role} />
+                <BookingStatusBadge status={booking.status} />
               </li>
             ))}
           </ul>
